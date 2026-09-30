@@ -26,6 +26,7 @@ function run(): void {
       timeMinutes: 420,
       location: "home",
       reputation: 0,
+      workShiftsCompleted: 0,
     },
     "initial state should be deterministic",
   );
@@ -43,6 +44,7 @@ function run(): void {
       timeMinutes: 15,
       location: "bus_stop",
       reputation: 0,
+      workShiftsCompleted: 0,
     },
     "travel should produce the expected state delta",
   );
@@ -62,6 +64,7 @@ function run(): void {
       timeMinutes: 498,
       location: "work",
       reputation: 1,
+      workShiftsCompleted: 0,
     },
     "negotiated transport should resolve deterministically",
   );
@@ -78,6 +81,7 @@ function run(): void {
       timeMinutes: 738,
       location: "work",
       reputation: 2,
+      workShiftsCompleted: 1,
     },
     "work should apply the expected reward and resource costs",
   );
@@ -94,6 +98,7 @@ function run(): void {
     timeMinutes: 420,
     location: "bus_stop",
     reputation: 0,
+    workShiftsCompleted: 0,
   };
   const noCash = applyCommand(poor, world, { type: "take_bus_to_work" });
   assert(!noCash.ok, "insufficient funds should block travel");
@@ -107,6 +112,7 @@ function run(): void {
     timeMinutes: 435,
     location: "bus_stop",
     reputation: 0,
+    workShiftsCompleted: 0,
   };
   const lowOffer = applyCommand(lowOfferState, world, {
     type: "negotiate_bus_to_work",
@@ -130,6 +136,12 @@ function run(): void {
   if (!endOfDay.ok) return;
   equal(endOfDay.state.timeMinutes, 728, "first-day path should resolve to the expected end time");
   assert(endOfDay.state.timeMinutes <= 22 * 60, "first-day path must stay within the playable day");
+  equal(endOfDay.state.workShiftsCompleted, 1, "the first day should allow exactly one work shift");
+
+  const repeatedShift = applyCommand(endOfDay.state, world, { type: "work_shift" });
+  assert(!repeatedShift.ok, "completed work must not be repeatable");
+  if (repeatedShift.ok) return;
+  equal(repeatedShift.code, "ACTION_LIMIT_REACHED", "repeat rewards should be blocked explicitly");
 
   console.log("HUSTLEVERSE game-engine checks passed.");
 }

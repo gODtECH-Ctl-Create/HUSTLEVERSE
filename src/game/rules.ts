@@ -5,6 +5,7 @@ export interface ActionRule {
   readonly cashNaira: number;
   readonly energy: number;
   readonly reputation: number;
+  readonly workShiftsCompleted: number;
   readonly destination?: PlayerState["location"];
 }
 
@@ -16,6 +17,7 @@ export function resolveRule(command: Command, world: WorldState): ActionRule {
         cashNaira: -200,
         energy: -3,
         reputation: 0,
+        workShiftsCompleted: 0,
         destination: "bus_stop",
       };
 
@@ -25,6 +27,7 @@ export function resolveRule(command: Command, world: WorldState): ActionRule {
         cashNaira: -world.standardBusFareNaira,
         energy: -6,
         reputation: 0,
+        workShiftsCompleted: 0,
         destination: "work",
       };
 
@@ -34,6 +37,7 @@ export function resolveRule(command: Command, world: WorldState): ActionRule {
         cashNaira: -command.offerNaira,
         energy: -7,
         reputation: command.offerNaira < world.standardBusFareNaira ? 1 : 0,
+        workShiftsCompleted: 0,
         destination: "work",
       };
 
@@ -43,6 +47,7 @@ export function resolveRule(command: Command, world: WorldState): ActionRule {
         cashNaira: 3_500,
         energy: -22,
         reputation: 1,
+        workShiftsCompleted: 1,
       };
   }
 }
@@ -58,5 +63,6 @@ export function toDelta(
     timeMinutes: after.timeMinutes - before.timeMinutes,
     location: after.location === before.location ? null : after.location,
     reputation: after.reputation - before.reputation,
+    workShiftsCompleted: after.workShiftsCompleted - before.workShiftsCompleted,
   };
 }

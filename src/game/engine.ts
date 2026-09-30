@@ -53,6 +53,10 @@ export function applyCommand(
     return failure("WRONG_LOCATION", "You need to reach work before starting a shift.", state);
   }
 
+  if (command.type === "work_shift" && state.workShiftsCompleted >= 1) {
+    return failure("ACTION_LIMIT_REACHED", "Today's work shift has already been completed.", state);
+  }
+
   if (
     command.type === "negotiate_bus_to_work" &&
     (command.offerNaira < world.minimumNegotiatedFareNaira ||
@@ -85,6 +89,7 @@ export function applyCommand(
     timeMinutes: state.timeMinutes + rule.timeMinutes,
     location: rule.destination ?? state.location,
     reputation: state.reputation + rule.reputation,
+    workShiftsCompleted: state.workShiftsCompleted + rule.workShiftsCompleted,
   };
 
   const delta = toDelta(rule, state, after);

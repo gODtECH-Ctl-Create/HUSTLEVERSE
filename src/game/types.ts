@@ -1,19 +1,10 @@
 export type LocationId = "home" | "bus_stop" | "work";
 
 export type Command =
-  | {
-      readonly type: "travel_to_bus_stop";
-    }
-  | {
-      readonly type: "take_bus_to_work";
-    }
-  | {
-      readonly type: "negotiate_bus_to_work";
-      readonly offerNaira: number;
-    }
-  | {
-      readonly type: "work_shift";
-    };
+  | { readonly type: "travel_to_bus_stop" }
+  | { readonly type: "take_bus_to_work" }
+  | { readonly type: "negotiate_bus_to_work"; readonly offerNaira: number }
+  | { readonly type: "work_shift" };
 
 export interface PlayerState {
   readonly cashNaira: number;
@@ -21,6 +12,7 @@ export interface PlayerState {
   readonly timeMinutes: number;
   readonly location: LocationId;
   readonly reputation: number;
+  readonly workShiftsCompleted: number;
 }
 
 export interface WorldState {
@@ -36,6 +28,7 @@ export interface StateDelta {
   readonly timeMinutes: number;
   readonly location: LocationId | null;
   readonly reputation: number;
+  readonly workShiftsCompleted: number;
 }
 
 export interface GameEvent {
@@ -53,7 +46,8 @@ export interface CommandFailure {
     | "INSUFFICIENT_ENERGY"
     | "WRONG_LOCATION"
     | "INVALID_OFFER"
-    | "OUT_OF_TIME";
+    | "OUT_OF_TIME"
+    | "ACTION_LIMIT_REACHED";
   readonly message: string;
   readonly state: PlayerState;
 }
@@ -77,6 +71,7 @@ export function createInitialPlayerState(): PlayerState {
     timeMinutes: DAY_START_MINUTES,
     location: "home",
     reputation: 0,
+    workShiftsCompleted: 0,
   };
 }
 
