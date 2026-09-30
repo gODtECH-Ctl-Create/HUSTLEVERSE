@@ -1,0 +1,21 @@
+name: Steward
+
+on:
+  pull_request:
+  push:
+
+permissions:
+  contents: read
+
+jobs:
+  steward:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Run gODtECH Steward
+        uses: gODtECH-Ctl-Create/gODtECH-Steward@MASTER
+        with:
+          path: .
+          args: '["scan", "--ci"]'
