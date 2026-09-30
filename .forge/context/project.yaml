@@ -1,0 +1,43 @@
+project:
+  name: HUSTLEVERSE
+  type: ai_native_game
+  stage: foundation
+  owner: gODtECH-Ctl-Create
+  repository: gODtECH-Ctl-Create/HUSTLEVERSE
+
+product:
+  premise: "A Nigerian life and hustle simulation where players navigate everyday trade-offs with AI-assisted interaction."
+  core_loop:
+    - situation
+    - reasoning
+    - conversation
+    - action
+    - deterministic_resolution
+    - consequence
+  first_playable_slice:
+    characters: 1
+    world_slice: 1
+    in_game_day: 1
+    scenario_count: "small"
+    multiplayer: false
+
+architecture:
+  game_state: deterministic
+  ai_role: "conversation, interpretation, NPC role-play, player assistance"
+  authoritative_state: server_side
+  database: "not required for local prototype; required for persistence"
+  database_candidate: "Supabase/PostgreSQL"
+  ai_boundary: "server-side gateway with validated action intents"
+
+contributor_model:
+  workflow: pull_request
+  repository_hygiene: "gODtECH Steward"
+  repo_ops: "shared gODtECH RepoOps reusable GitHub Action"
+
+principles:
+  - prove the game loop before expanding the world
+  - keep game rules deterministic
+  - constrain AI actions
+  - prefer small composable systems
+  - record material architectural decisions
+  - protect secrets and player data

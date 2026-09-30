@@ -1,0 +1,24 @@
+name: RepoOps
+
+on:
+  issue_comment:
+    types: [created]
+  issues:
+    types: [closed]
+  pull_request_target:
+    types: [closed]
+
+permissions:
+  contents: read
+  issues: write
+  pull-requests: write
+
+jobs:
+  repoops:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository policy
+        uses: actions/checkout@v4
+
+      - name: Run shared RepoOps
+        uses: gODtECH-Ctl-Create/RepoOps@v0
