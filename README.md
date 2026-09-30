@@ -12,6 +12,8 @@ Transport changes. A client calls. Data finishes. Power goes out. An unexpected 
 
 The game is designed around the idea that AI should be part of the experience itself, not a chatbot sitting beside the game.
 
+The first deterministic game engine is now implemented. The current slice can simulate leaving home, reaching the bus stop, negotiating or paying transport to work, and completing a work shift without a database or model provider.
+
 ## Core loop
 
 ```text
@@ -54,6 +56,36 @@ HUSTLEVERSE is not just a Nigerian-themed game.
 The Nigerian context affects the mechanics.
 
 Transport, bargaining, family expectations, electricity, data, work culture, side hustles, opportunities, delays, social networks, and everyday trade-offs can all become systems the player has to navigate.
+
+## Game engine
+
+The engine follows a strict command pipeline:
+
+```text
+PlayerState + WorldState
+        ↓
+      Command
+        ↓
+   Preconditions
+        ↓
+   Deterministic rule
+        ↓
+    State Delta
+        ↓
+     Game Event
+```
+
+The first slice includes:
+
+- money in naira;
+- time from 7:00 AM through the playable day;
+- energy;
+- home, bus stop, and work locations;
+- transport pricing and a negotiation floor;
+- a deterministic work reward;
+- explicit failure results when a command is invalid, unaffordable, too tiring, or outside the playable day.
+
+Run the current engine checks locally with `npm install`, `npm run check`, and `npm test`.
 
 ## AI philosophy
 
@@ -146,9 +178,9 @@ See [docs/REPO-OPS.md](docs/REPO-OPS.md).
 
 ## Status
 
-**Stage:** concept and foundation
+**Stage:** first playable engine prototype
 
-The repository intentionally starts almost empty. Product rules and architecture are being established before feature code so future contributors can build against a shared model.
+The repository now contains the deterministic simulation core for the first playable day. The user interface, persistence, and AI layer remain intentionally deferred until the game loop is exercised through real gameplay.
 
 ---
 
