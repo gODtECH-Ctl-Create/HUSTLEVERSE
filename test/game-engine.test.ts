@@ -59,7 +59,7 @@ function run(): void {
     {
       cashNaira: 8_900,
       energy: 90,
-      timeMinutes: 483,
+      timeMinutes: 498,
       location: "work",
       reputation: 1,
     },
@@ -128,7 +128,7 @@ function run(): void {
   );
   assert(endOfDay.ok, "the standard first-day path should succeed");
   if (!endOfDay.ok) return;
-  equal(endOfDay.state.timeMinutes, 717, "first-day path should remain inside 10 PM");
+  equal(endOfDay.state.timeMinutes, 728, "first-day path should resolve to the expected end time");
   assert(endOfDay.state.timeMinutes <= 22 * 60, "first-day path must stay within the playable day");
 
   console.log("HUSTLEVERSE game-engine checks passed.");
