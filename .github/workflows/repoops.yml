@@ -1,0 +1,20 @@
+name: RepoOps
+
+on:
+  issue_comment:
+    types: [created]
+  issues:
+    types: [closed]
+  pull_request_target:
+    types: [closed]
+
+permissions:
+  contents: read
+  issues: write
+  pull-requests: write
+
+jobs:
+  repoops:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: gODtECH-Ctl-Create/RepoOps@v0
