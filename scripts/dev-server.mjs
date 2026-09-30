@@ -1,6 +1,6 @@
 import { createServer } from "node:http";
 import { readFile } from "node:fs/promises";
-import { extname, join, normalize, resolve } from "node:path";
+import { extname, join, normalize, resolve, sep } from "node:path";
 import { fileURLToPath } from "node:url";
 
 const root = resolve(fileURLToPath(new URL("..", import.meta.url)));
@@ -20,7 +20,7 @@ function safePath(urlPath) {
   const pathname = decodeURIComponent(urlPath.split("?")[0] || "/");
   const requested = pathname === "/" ? "/client/index.html" : pathname;
   const absolute = normalize(join(root, requested));
-  if (!absolute.startsWith(root)) return null;
+  if (absolute !== root && !absolute.startsWith(`${root}${sep}`)) return null;
   return absolute;
 }
 
