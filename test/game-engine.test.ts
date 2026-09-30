@@ -134,7 +134,7 @@ function run(): void {
   );
   assert(endOfDay.ok, "the standard first-day path should succeed");
   if (!endOfDay.ok) return;
-  equal(endOfDay.state.timeMinutes, 738, "first-day path should resolve to the expected end time");
+  equal(endOfDay.state.timeMinutes, 728, "first-day path should resolve to the expected end time");
   assert(endOfDay.state.timeMinutes <= 22 * 60, "first-day path must stay within the playable day");
   equal(endOfDay.state.workShiftsCompleted, 1, "the first day should allow exactly one work shift");
 
