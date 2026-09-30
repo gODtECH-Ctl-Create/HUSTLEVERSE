@@ -1,0 +1,19 @@
+{
+  "name": "hustleverse",
+  "private": true,
+  "version": "0.1.0",
+  "description": "A deterministic game engine for the HUSTLEVERSE first playable slice.",
+  "type": "module",
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "test": "npm run build && node --test dist/test/*.test.js",
+    "check": "tsc --noEmit -p tsconfig.json"
+  },
+  "devDependencies": {
+    "@types/node": "^24.3.0",
+    "typescript": "^5.9.2"
+  },
+  "engines": {
+    "node": ">=20"
+  }
+}
