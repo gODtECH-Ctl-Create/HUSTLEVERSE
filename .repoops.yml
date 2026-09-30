@@ -1,0 +1,22 @@
+commands:
+  claim: true
+  unclaim: true
+
+labels:
+  ready: "status: ready"
+  inProgress: "status: in-progress"
+
+assignments:
+  reminderAfterDays: 3
+  expireAfterDays: 7
+  autoRelease: false
+
+contributorLimits:
+  maxActiveAssignments: 2
+  limitMaintainers: false
+
+contributorGuidance:
+  enabled: true
+  requirements: "Project requirements will be documented as the application stack is established."
+  contributingUrl: "https://github.com/gODtECH-Ctl-Create/HUSTLEVERSE/blob/main/CONTRIBUTING.md"
+  architectureUrl: "https://github.com/gODtECH-Ctl-Create/HUSTLEVERSE/blob/main/.forge/docs/ARCHITECTURE.md"
