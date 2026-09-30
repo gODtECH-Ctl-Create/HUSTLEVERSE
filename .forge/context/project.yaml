@@ -32,7 +32,7 @@ architecture:
 contributor_model:
   workflow: pull_request
   repository_hygiene: "gODtECH Steward"
-  repo_ops: "planned shared automation after application contracts stabilize"
+  repo_ops: "shared gODtECH RepoOps reusable GitHub Action"
 
 principles:
   - prove the game loop before expanding the world
