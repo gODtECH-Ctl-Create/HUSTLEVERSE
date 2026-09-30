@@ -1,5 +1,3 @@
-import test from "node:test";
-import assert from "node:assert/strict";
 import {
   applyCommand,
   createDefaultWorldState,
@@ -7,75 +5,89 @@ import {
   type PlayerState,
 } from "../src/game/index.js";
 
-const world = createDefaultWorldState();
+function assert(condition: boolean, message: string): void {
+  if (!condition) throw new Error(message);
+}
 
-test("initial state starts at home with ₦10,000 and full energy", () => {
-  assert.deepEqual(createInitialPlayerState(), {
-    cashNaira: 10_000,
-    energy: 100,
-    timeMinutes: 420,
-    location: "home",
-    reputation: 0,
-  });
-});
+function equal<T>(actual: T, expected: T, message: string): void {
+  if (JSON.stringify(actual) !== JSON.stringify(expected)) {
+    throw new Error(`${message}\nExpected: ${JSON.stringify(expected)}\nActual: ${JSON.stringify(actual)}`);
+  }
+}
 
-test("valid commands produce deterministic deltas", () => {
+function run(): void {
+  const world = createDefaultWorldState();
+
+  equal(
+    createInitialPlayerState(),
+    {
+      cashNaira: 10_000,
+      energy: 100,
+      timeMinutes: 420,
+      location: "home",
+      reputation: 0,
+    },
+    "initial state should be deterministic",
+  );
+
   const start = createInitialPlayerState();
-
   const toStop = applyCommand(start, world, { type: "travel_to_bus_stop" });
-  assert.equal(toStop.ok, true);
+  assert(toStop.ok, "walking to the bus stop should succeed");
   if (!toStop.ok) return;
 
-  assert.deepEqual(toStop.delta, {
-    cashNaira: -200,
-    energy: -3,
-    timeMinutes: 15,
-    location: "bus_stop",
-    reputation: 0,
-  });
+  equal(
+    toStop.delta,
+    {
+      cashNaira: -200,
+      energy: -3,
+      timeMinutes: 15,
+      location: "bus_stop",
+      reputation: 0,
+    },
+    "travel should produce the expected state delta",
+  );
 
   const toWork = applyCommand(toStop.state, world, {
     type: "negotiate_bus_to_work",
     offerNaira: 900,
   });
-  assert.equal(toWork.ok, true);
+  assert(toWork.ok, "a floor-rate negotiation should succeed");
   if (!toWork.ok) return;
 
-  assert.deepEqual(toWork.state, {
-    cashNaira: 8_900,
-    energy: 90,
-    timeMinutes: 483,
-    location: "work",
-    reputation: 1,
-  });
+  equal(
+    toWork.state,
+    {
+      cashNaira: 8_900,
+      energy: 90,
+      timeMinutes: 483,
+      location: "work",
+      reputation: 1,
+    },
+    "negotiated transport should resolve deterministically",
+  );
 
   const shift = applyCommand(toWork.state, world, { type: "work_shift" });
-  assert.equal(shift.ok, true);
+  assert(shift.ok, "work should succeed after reaching work");
   if (!shift.ok) return;
 
-  assert.deepEqual(shift.state, {
-    cashNaira: 12_400,
-    energy: 68,
-    timeMinutes: 723,
-    location: "work",
-    reputation: 2,
-  });
-});
+  equal(
+    shift.state,
+    {
+      cashNaira: 12_400,
+      energy: 68,
+      timeMinutes: 723,
+      location: "work",
+      reputation: 2,
+    },
+    "work should apply the expected reward and resource costs",
+  );
 
-test("invalid commands do not mutate state", () => {
-  const start = createInitialPlayerState();
+  const invalid = applyCommand(start, world, { type: "work_shift" });
+  assert(!invalid.ok, "work from home must be rejected");
+  if (invalid.ok) return;
+  equal(invalid.code, "WRONG_LOCATION", "wrong location should be the failure reason");
+  equal(invalid.state, start, "rejected commands must not mutate state");
 
-  const result = applyCommand(start, world, { type: "work_shift" });
-
-  assert.equal(result.ok, false);
-  assert.equal(result.code, "WRONG_LOCATION");
-  assert.deepEqual(result.state, start);
-  assert.equal(start.cashNaira, 10_000);
-  assert.equal(start.timeMinutes, 420);
-  assert.equal(start.energy, 100);
-});
-
-test("insufficient cash blocks transport without changing state", () => {
   const poor: PlayerState = {
     cashNaira: 100,
     energy: 100,
@@ -83,49 +95,43 @@ test("insufficient cash blocks transport without changing state", () => {
     location: "bus_stop",
     reputation: 0,
   };
+  const noCash = applyCommand(poor, world, { type: "take_bus_to_work" });
+  assert(!noCash.ok, "insufficient funds should block travel");
+  if (noCash.ok) return;
+  equal(noCash.code, "INSUFFICIENT_FUNDS", "insufficient funds should be explicit");
+  equal(noCash.state, poor, "failed commands preserve state");
 
-  const result = applyCommand(poor, world, { type: "take_bus_to_work" });
-
-  assert.equal(result.ok, false);
-  assert.equal(result.code, "INSUFFICIENT_FUNDS");
-  assert.deepEqual(result.state, poor);
-});
-
-test("offers below the negotiated floor are rejected", () => {
-  const state: PlayerState = {
+  const lowOfferState: PlayerState = {
     cashNaira: 10_000,
     energy: 100,
     timeMinutes: 435,
     location: "bus_stop",
     reputation: 0,
   };
-
-  const result = applyCommand(state, world, {
+  const lowOffer = applyCommand(lowOfferState, world, {
     type: "negotiate_bus_to_work",
     offerNaira: 500,
   });
+  assert(!lowOffer.ok, "offers below the floor should be rejected");
+  if (lowOffer.ok) return;
+  equal(lowOffer.code, "INVALID_OFFER", "offer rejection should be explicit");
+  equal(lowOffer.state, lowOfferState, "rejected offers preserve state");
 
-  assert.equal(result.ok, false);
-  assert.equal(result.code, "INVALID_OFFER");
-  assert.deepEqual(result.state, state);
-});
+  const endOfDay = applyCommand(
+    (applyCommand(
+      (applyCommand(start, world, { type: "travel_to_bus_stop" }) as { ok: true; state: PlayerState }).state,
+      world,
+      { type: "take_bus_to_work" },
+    ) as { ok: true; state: PlayerState }).state,
+    world,
+    { type: "work_shift" },
+  );
+  assert(endOfDay.ok, "the standard first-day path should succeed");
+  if (!endOfDay.ok) return;
+  equal(endOfDay.state.timeMinutes, 717, "first-day path should remain inside 10 PM");
+  assert(endOfDay.state.timeMinutes <= 22 * 60, "first-day path must stay within the playable day");
 
-test("the first-day sequence remains inside the playable day", () => {
-  const start = createInitialPlayerState();
-  const toStop = applyCommand(start, world, { type: "travel_to_bus_stop" });
-  assert.equal(toStop.ok, true);
-  if (!toStop.ok) return;
+  console.log("HUSTLEVERSE game-engine checks passed.");
+}
 
-  const toWork = applyCommand(toStop.state, world, {
-    type: "take_bus_to_work",
-  });
-  assert.equal(toWork.ok, true);
-  if (!toWork.ok) return;
-
-  const shift = applyCommand(toWork.state, world, { type: "work_shift" });
-  assert.equal(shift.ok, true);
-  if (!shift.ok) return;
-
-  assert.equal(shift.state.timeMinutes, 717);
-  assert.ok(shift.state.timeMinutes <= 22 * 60);
-});
+run();
