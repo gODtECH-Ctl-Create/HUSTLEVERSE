@@ -7,6 +7,7 @@
   "scripts": {
     "build": "tsc -p tsconfig.json",
     "test": "npm run build && node dist/test/game-engine.test.js",
+    "dev": "npm run build && node scripts/dev-server.mjs",
     "check": "tsc --noEmit -p tsconfig.json"
   },
   "devDependencies": {
