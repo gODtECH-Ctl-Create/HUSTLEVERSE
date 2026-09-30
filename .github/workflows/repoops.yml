@@ -17,4 +17,8 @@ jobs:
   repoops:
     runs-on: ubuntu-latest
     steps:
-      - uses: gODtECH-Ctl-Create/RepoOps@v0
+      - name: Check out repository policy
+        uses: actions/checkout@v4
+
+      - name: Run shared RepoOps
+        uses: gODtECH-Ctl-Create/RepoOps@v0
