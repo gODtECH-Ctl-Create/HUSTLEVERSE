@@ -1,63 +1,90 @@
 # Repository Operations
 
-HUSTLEVERSE is intended to become a contributor-friendly project, so repository operations are part of the design from the beginning.
+HUSTLEVERSE consumes the reusable **gODtECH RepoOps** GitHub Action.
 
-## Current layer
+This is different from gODtECH Steward:
 
-The repository starts with gODtECH Steward for deterministic repository hygiene on pushes and pull requests.
+- **RepoOps** handles repository collaboration operations such as issue claiming, contributor guidance, assignment lifecycle, and post-merge follow-up.
+- **Steward** performs deterministic repository hygiene checks.
 
-This provides a small, low-risk baseline while the application is still empty.
+## Current setup
 
-## Later Repo Ops layer
+HUSTLEVERSE keeps only the repository-specific policy in:
 
-When the application has stable:
+- [.repoops.yml](../.repoops.yml)
+- [.github/workflows/repoops.yml](../.github/workflows/repoops.yml)
 
-- dependency installation;
-- lint/test/build commands;
-- release/version metadata;
-- ownership rules;
-- contributor checks;
+The implementation stays in the shared repository:
 
-HUSTLEVERSE can be connected to the shared Repo Ops automation.
+gODtECH-Ctl-Create/RepoOps
 
-The expected model is:
+The consumer repository therefore does not copy the RepoOps runtime.
 
-```text
-Contributor PR
-   ↓
-CI + Steward
-   ↓
-Project validation
-   ↓
-Repo Ops policy checks
-   ↓
-Review
-   ↓
-Merge
+## Reusable action
+
+The current workflow consumes the stable major channel:
+
+```yaml
+- uses: gODtECH-Ctl-Create/RepoOps@v0
 ```
 
-Repo Ops should automate repeatable repository work, not make product decisions.
+The shared project documents that `@v0` is a moving compatibility channel, while exact release tags can be pinned when tighter control is required.
 
-## Important separation
+## Contributor flow
 
-Game logic and repository automation are independent.
+```text
+Issue marked ready
+      ↓
+Contributor comments /claim
+      ↓
+RepoOps validates the claim
+      ↓
+Assignment + in-progress state
+      ↓
+Contributor opens PR
+      ↓
+PR merges
+      ↓
+RepoOps handles linked-issue follow-up
+```
 
-A repository automation failure must not change player data or game state.
+This is useful for HUSTLEVERSE once contributors begin working on the game.
+
+## Local policy
+
+HUSTLEVERSE controls the behavior that is specific to this project through `.repoops.yml`.
+
+The shared RepoOps repository controls the reusable runtime and receives improvements centrally.
 
 ## Version updates
 
-The previously discussed reusable automatic-version workflow should be attached only after the repository has a real package/release contract. Doing it now would create versioning policy before there is anything meaningful to version.
+When the shared RepoOps project publishes a compatible release, repositories using `@v0` automatically consume the current `v0` implementation when their workflow runs.
 
-## Contributor growth
+A repository using an exact version such as `@v0.3.0` remains pinned until its workflow is changed.
 
-As external contributors arrive, add:
+## Security
 
-- contribution labels;
-- issue templates;
-- pull request template;
-- CODEOWNERS where ownership becomes clear;
-- required status checks;
-- release automation;
-- dependency and security update policy.
+The workflow does not check out contributor-controlled pull request code before the reusable RepoOps action. The action receives only the permissions declared by the caller workflow.
 
-Keep the contributor surface simple until the community actually needs more structure.
+## Relationship to Steward
+
+Both layers can coexist:
+
+```text
+                 HUSTLEVERSE
+                     │
+        ┌────────────┴────────────┐
+        ↓                         ↓
+     RepoOps                   Steward
+ collaboration              repository hygiene
+        │                         │
+ claim / unclaim             deterministic scan
+ contributor guidance        repository checks
+ issue lifecycle
+        │                         │
+        └────────────┬────────────┘
+                     ↓
+                 Pull Request
+```
+
+RepoOps should not make product decisions, and Steward should not modify game behavior.
