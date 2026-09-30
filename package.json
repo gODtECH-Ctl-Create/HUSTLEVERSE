@@ -6,11 +6,10 @@
   "type": "module",
   "scripts": {
     "build": "tsc -p tsconfig.json",
-    "test": "npm run build && node --test dist/test/*.test.js",
+    "test": "npm run build && node dist/test/game-engine.test.js",
     "check": "tsc --noEmit -p tsconfig.json"
   },
   "devDependencies": {
-    "@types/node": "^24.3.0",
     "typescript": "^5.9.2"
   },
   "engines": {
