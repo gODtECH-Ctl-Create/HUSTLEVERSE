@@ -28,6 +28,6 @@ export const firstDayScenarios: readonly Scenario[] = [
     title: "Clock In",
     description: "You made it to work. Time to earn today's money.",
     availableCommands: ["work_shift"],
-    canStart: (state) => state.location === "work",
+    canStart: (state) => state.location === "work" && state.workShiftsCompleted === 0,
   },
 ];
