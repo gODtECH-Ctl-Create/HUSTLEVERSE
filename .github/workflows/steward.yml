@@ -1,4 +1,5 @@
 name: Steward
+# Verification: shared Steward Action runtime dependencies are resolved by the Action.
 
 on:
   pull_request:
