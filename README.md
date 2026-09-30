@@ -94,7 +94,7 @@ The expected production architecture will likely need:
 | AI service | Server-side model gateway for dialogue and NPC behavior |
 | Storage | Optional media/assets storage |
 | Observability | Errors, gameplay events, AI usage, and abuse monitoring |
-| Repository automation | Contributor checks, repository hygiene, and later shared Repo Ops |
+| Repository automation | gODtECH RepoOps + Steward |
 
 ### Database
 
@@ -118,9 +118,19 @@ Do not allow arbitrary AI output to execute code, issue database mutations, gran
 
 ## Repository operations
 
-HUSTLEVERSE is being prepared for contributor-driven development.
+HUSTLEVERSE consumes the shared **gODtECH RepoOps** GitHub Action.
 
-The initial repository automation uses gODtECH Steward for deterministic repository hygiene. A future shared Repo Ops workflow can be added when the application has stable build/test/version contracts.
+Repository-specific policy lives in [.repoops.yml](.repoops.yml), while the reusable implementation lives in [gODtECH-Ctl-Create/RepoOps](https://github.com/gODtECH-Ctl-Create/RepoOps).
+
+The current workflow consumes the moving compatible major channel:
+
+```yaml
+- uses: gODtECH-Ctl-Create/RepoOps@v0
+```
+
+So the RepoOps runtime is not copied into HUSTLEVERSE. Compatible shared releases are picked up when the workflow runs.
+
+HUSTLEVERSE also runs **gODtECH Steward** for deterministic repository hygiene.
 
 See [docs/REPO-OPS.md](docs/REPO-OPS.md).
 
