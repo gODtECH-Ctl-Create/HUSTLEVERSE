@@ -1,0 +1,9 @@
+project:
+  state: active
+  priority: high
+  current_focus: "First playable Nigerian life-and-hustle slice"
+  next_step: "Continue expanding the playable core without introducing unnecessary AI or persistence complexity"
+  blockers:
+    - []
+  status_note: "Deterministic game rules remain authoritative; AI is an experience layer."
+  last_worked_on: "2026-10-04"
